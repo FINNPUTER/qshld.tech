@@ -1,0 +1,920 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QSHIELD // Quantum Threat Intelligence</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Syne:wght@400;500;600;700;800&family=Outfit:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+:root {
+  --bg: #050506;
+  --bg-elevated: #0a0a0c;
+  --bg-surface: #0e0e11;
+  --border: #18181e;
+  --border-hover: #25252e;
+  --text: #d8d8e0;
+  --text-secondary: #6a6a7a;
+  --text-muted: #3a3a48;
+  --accent: #a0a0b0;
+  --accent-bright: #d0d0dd;
+  --font-display: 'Syne', sans-serif;
+  --font-body: 'Outfit', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+html { scroll-behavior: smooth; }
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--font-body);
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ===== FILM GRAIN ===== */
+.grain {
+  position: fixed; inset: 0; z-index: 9999; pointer-events: none;
+  opacity: 0.4;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.018'/%3E%3C/svg%3E");
+}
+
+/* ===== LETTERBOX ===== */
+.lb-top, .lb-bot {
+  position: fixed; left: 0; right: 0; z-index: 9998; pointer-events: none;
+  background: #000;
+}
+.lb-top { top: 0; height: 3.5vh; }
+.lb-bot { bottom: 0; height: 3.5vh; }
+
+/* ===== CANVAS ===== */
+#bg-canvas {
+  position: fixed; inset: 0; z-index: 0; pointer-events: none; opacity: 0.25;
+}
+
+/* ===== NAV ===== */
+nav {
+  position: fixed; top: 3.5vh; left: 0; right: 0; z-index: 1000;
+  padding: 20px 56px;
+  display: flex; justify-content: space-between; align-items: center;
+  backdrop-filter: blur(40px) saturate(1.1);
+  background: rgba(5,5,6,0.65);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo {
+  font-family: var(--font-display); font-weight: 800; font-size: 1.15rem;
+  letter-spacing: 0.2em; color: var(--text); text-decoration: none;
+}
+.nav-links { display: flex; gap: 32px; list-style: none; }
+.nav-links a {
+  color: var(--text-secondary); text-decoration: none; font-family: var(--font-mono);
+  font-size: 0.7rem; letter-spacing: 0.12em; text-transform: uppercase;
+  transition: color 0.5s;
+}
+.nav-links a:hover { color: var(--text); }
+.nav-cta {
+  background: transparent; border: 1px solid var(--border);
+  color: var(--text-secondary); padding: 10px 28px;
+  font-family: var(--font-mono); font-size: 0.7rem;
+  letter-spacing: 0.14em; text-transform: uppercase;
+  cursor: pointer; text-decoration: none; transition: all 0.5s;
+}
+.nav-cta:hover { border-color: var(--text-secondary); color: var(--text); }
+
+/* ===== HERO ===== */
+.hero {
+  min-height: 100vh; display: flex; flex-direction: column;
+  justify-content: center; align-items: center; text-align: center;
+  padding: 160px 48px 80px; position: relative; z-index: 1;
+}
+.hero-eyebrow {
+  font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-secondary);
+  letter-spacing: 0.35em; text-transform: uppercase; margin-bottom: 48px;
+  opacity: 0; animation: fadeIn 1.5s 0.3s ease forwards;
+}
+.hero-eyebrow .dot {
+  display: inline-block; width: 5px; height: 5px; border-radius: 50%;
+  background: var(--text-secondary); margin-right: 12px;
+  animation: slowPulse 3s ease-in-out infinite;
+}
+@keyframes slowPulse {
+  0%,100% { opacity: 1; } 50% { opacity: 0.2; }
+}
+
+h1.hero-title {
+  font-family: var(--font-display); font-weight: 800;
+  font-size: clamp(3.5rem, 8.5vw, 8rem); line-height: 0.88;
+  letter-spacing: -0.05em; margin-bottom: 44px;
+  color: var(--text);
+}
+.title-line {
+  display: block; overflow: hidden;
+}
+.title-inner {
+  display: block; transform: translateY(115%);
+  animation: slideUp 1.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.title-line:nth-child(2) .title-inner { animation-delay: 0.12s; }
+.title-line:nth-child(3) .title-inner { animation-delay: 0.24s; }
+@keyframes slideUp { to { transform: translateY(0); } }
+
+.title-dim { color: var(--text-secondary); }
+
+.hero-body {
+  font-size: clamp(0.95rem, 1.4vw, 1.1rem); color: var(--text-secondary);
+  max-width: 480px; font-weight: 300; line-height: 1.85;
+  margin-bottom: 64px;
+  opacity: 0; animation: fadeIn 1.2s 0.7s ease forwards;
+}
+@keyframes fadeIn { to { opacity: 1; } }
+
+.hero-ctas {
+  display: flex; gap: 16px;
+  opacity: 0; animation: fadeIn 1.2s 0.9s ease forwards;
+}
+.btn-main {
+  background: var(--text); color: var(--bg); border: none;
+  padding: 18px 48px; font-family: var(--font-display); font-weight: 700;
+  font-size: 0.82rem; letter-spacing: 0.12em; text-transform: uppercase;
+  cursor: pointer; transition: all 0.5s; text-decoration: none;
+  position: relative; overflow: hidden;
+}
+.btn-main::after {
+  content: ''; position: absolute; inset: 0;
+  background: linear-gradient(90deg, transparent, rgba(255,255,255,0.15), transparent);
+  transform: translateX(-100%); transition: transform 0.7s;
+}
+.btn-main:hover::after { transform: translateX(100%); }
+.btn-main:hover { transform: translateY(-2px); box-shadow: 0 8px 40px rgba(0,0,0,0.5); }
+
+.btn-outline {
+  background: transparent; color: var(--text-secondary); border: 1px solid var(--border);
+  padding: 18px 48px; font-family: var(--font-display); font-weight: 600;
+  font-size: 0.82rem; letter-spacing: 0.12em; text-transform: uppercase;
+  cursor: pointer; transition: all 0.5s; text-decoration: none;
+}
+.btn-outline:hover { border-color: var(--text-secondary); color: var(--text); }
+
+/* ===== COUNTDOWN ===== */
+.countdown {
+  padding: 0 48px 48px; display: flex; flex-direction: column;
+  align-items: center; position: relative; z-index: 1;
+}
+.cd-row { display: flex; gap: 16px; align-items: center; }
+.cd-block { text-align: center; min-width: 80px; }
+.cd-num {
+  font-family: var(--font-mono); font-size: clamp(2rem, 4vw, 3.2rem);
+  font-weight: 500; color: var(--text); line-height: 1;
+}
+.cd-lbl {
+  font-family: var(--font-mono); font-size: 0.55rem; color: var(--text-muted);
+  letter-spacing: 0.3em; text-transform: uppercase; margin-top: 6px;
+}
+.cd-colon {
+  font-family: var(--font-mono); font-size: 2rem; color: var(--text-muted);
+  opacity: 0.25; padding-bottom: 16px;
+}
+.cd-caption {
+  font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-muted);
+  letter-spacing: 0.2em; text-transform: uppercase; margin-top: 20px; opacity: 0.4;
+}
+
+/* ===== SECTIONS ===== */
+.wrap {
+  max-width: 1080px; margin: 0 auto; padding: 140px 48px;
+  position: relative; z-index: 1;
+}
+.line { max-width: 1080px; margin: 0 auto; height: 1px; background: var(--border); position: relative; z-index: 1; }
+
+.label {
+  font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-muted);
+  letter-spacing: 0.35em; text-transform: uppercase; margin-bottom: 20px;
+}
+.heading {
+  font-family: var(--font-display); font-weight: 800;
+  font-size: clamp(1.8rem, 3.5vw, 2.8rem); letter-spacing: -0.03em;
+  margin-bottom: 20px; line-height: 1.1;
+}
+.intro {
+  color: var(--text-secondary); font-size: 1rem; max-width: 520px;
+  font-weight: 300; line-height: 1.85; margin-bottom: 72px;
+}
+
+/* ===== REVEAL ===== */
+.r { opacity: 0; transform: translateY(50px); transition: opacity 1.2s cubic-bezier(0.16,1,0.3,1), transform 1.2s cubic-bezier(0.16,1,0.3,1); }
+.r.v { opacity: 1; transform: translateY(0); }
+.rd1 { transition-delay: 0.1s; }
+.rd2 { transition-delay: 0.2s; }
+.rd3 { transition-delay: 0.3s; }
+.rd4 { transition-delay: 0.4s; }
+
+/* ===== THREAT INDEX ===== */
+.ti-card {
+  background: var(--bg-elevated); border: 1px solid var(--border); padding: 56px;
+  position: relative;
+}
+.ti-top { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 48px; flex-wrap: wrap; gap: 24px; }
+.ti-score {
+  font-family: var(--font-mono); font-size: clamp(4rem, 7vw, 6rem);
+  font-weight: 500; color: var(--text); line-height: 1;
+}
+.ti-score span { color: var(--text-muted); font-size: 0.4em; }
+.ti-meta { text-align: right; }
+.ti-level {
+  font-family: var(--font-display); font-size: 1rem; font-weight: 700;
+  color: var(--accent-bright); text-transform: uppercase; letter-spacing: 0.15em;
+}
+.ti-updated { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-muted); margin-top: 4px; }
+
+.ti-bar { margin-bottom: 48px; }
+.ti-track { height: 2px; background: var(--border); position: relative; }
+.ti-fill {
+  height: 100%; width: 0; background: var(--text-secondary);
+  transition: width 2.5s cubic-bezier(0.16,1,0.3,1);
+}
+.ti-fill.go { width: 42%; }
+.ti-marker {
+  position: absolute; right: 0; top: -5px;
+  width: 12px; height: 12px; border-radius: 50%;
+  background: var(--text); box-shadow: 0 0 20px rgba(216,216,224,0.15);
+}
+.ti-labels {
+  display: flex; justify-content: space-between; margin-top: 12px;
+  font-family: var(--font-mono); font-size: 0.55rem; color: var(--text-muted);
+  letter-spacing: 0.15em; text-transform: uppercase;
+}
+
+.ti-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; }
+.ti-fact {
+  background: var(--bg-surface); border: 1px solid var(--border); padding: 24px;
+  transition: background 0.4s;
+}
+.ti-fact:hover { background: var(--bg-elevated); }
+.ti-fact-label {
+  font-family: var(--font-mono); font-size: 0.55rem; color: var(--text-muted);
+  letter-spacing: 0.2em; text-transform: uppercase; margin-bottom: 10px;
+}
+.ti-fact-val {
+  font-family: var(--font-mono); font-size: 1.15rem; font-weight: 500; color: var(--text);
+}
+
+/* ===== CHAINS ===== */
+.chains-list { display: flex; flex-direction: column; gap: 1px; }
+.chain-row {
+  background: var(--bg-elevated); border: 1px solid var(--border);
+  padding: 28px 36px; display: grid; grid-template-columns: 160px 1fr 80px 100px;
+  align-items: center; gap: 24px; transition: background 0.4s;
+}
+.chain-row:hover { background: var(--bg-surface); }
+.ch-name { font-family: var(--font-display); font-weight: 700; font-size: 0.95rem; }
+.ch-bar { height: 2px; background: var(--border); border-radius: 1px; overflow: hidden; }
+.ch-fill { height: 100%; background: var(--text-secondary); transition: width 2s cubic-bezier(0.16,1,0.3,1); width: 0; }
+.ch-pct { font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-secondary); text-align: right; }
+.ch-risk {
+  font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.15em;
+  text-transform: uppercase; text-align: right; color: var(--text-muted);
+}
+
+/* ===== EDUCATION ===== */
+.edu-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1px; margin-bottom: 48px; }
+.edu-card {
+  background: var(--bg-elevated); border: 1px solid var(--border); padding: 48px;
+  position: relative;
+}
+.edu-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 1px;
+}
+.edu-card.safe::before { background: var(--text-secondary); }
+.edu-card.danger::before { background: var(--text-muted); }
+.edu-tag {
+  font-family: var(--font-mono); font-size: 0.55rem; letter-spacing: 0.3em;
+  text-transform: uppercase; margin-bottom: 20px;
+}
+.edu-card.safe .edu-tag { color: var(--accent); }
+.edu-card.danger .edu-tag { color: var(--text-secondary); }
+.edu-card h4 {
+  font-family: var(--font-display); font-weight: 700; font-size: 1.2rem;
+  margin-bottom: 14px;
+}
+.edu-card p { color: var(--text-secondary); font-size: 0.88rem; font-weight: 300; line-height: 1.8; }
+.edu-code {
+  font-family: var(--font-mono); font-size: 0.65rem; color: var(--text-muted);
+  margin-top: 16px; padding: 16px; background: rgba(255,255,255,0.015);
+  border: 1px solid var(--border); word-break: break-all; line-height: 1.6;
+}
+
+.edu-steps { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; }
+.edu-step {
+  background: var(--bg-elevated); border: 1px solid var(--border); padding: 40px;
+  transition: background 0.4s;
+}
+.edu-step:hover { background: var(--bg-surface); }
+.edu-step-n {
+  font-family: var(--font-mono); font-size: 0.55rem; color: var(--text-muted);
+  letter-spacing: 0.3em; margin-bottom: 20px;
+}
+.edu-step h5 { font-family: var(--font-display); font-weight: 700; font-size: 1rem; margin-bottom: 10px; }
+.edu-step p { color: var(--text-secondary); font-size: 0.82rem; font-weight: 300; line-height: 1.75; }
+
+/* ===== SCANNER ===== */
+.scan-card {
+  background: var(--bg-elevated); border: 1px solid var(--border);
+  padding: 72px; text-align: center; position: relative;
+}
+.scan-rings {
+  width: 80px; height: 80px; margin: 0 auto 40px; position: relative;
+}
+.scan-ring {
+  position: absolute; inset: 0; border: 1px solid var(--border);
+  border-radius: 50%; animation: ringPulse 4s ease-out infinite;
+}
+.scan-ring:nth-child(2) { animation-delay: 1.3s; }
+.scan-ring:nth-child(3) { animation-delay: 2.6s; }
+@keyframes ringPulse {
+  0% { transform: scale(0.4); opacity: 0.6; }
+  100% { transform: scale(2.8); opacity: 0; }
+}
+.scan-dot {
+  position: absolute; top: 50%; left: 50%; transform: translate(-50%,-50%);
+  width: 6px; height: 6px; border-radius: 50%; background: var(--text-secondary);
+}
+.scan-card h3 {
+  font-family: var(--font-display); font-weight: 700; font-size: 1.6rem;
+  margin-bottom: 14px;
+}
+.scan-card > p {
+  color: var(--text-secondary); max-width: 440px; margin: 0 auto 40px;
+  font-weight: 300; line-height: 1.8; font-size: 0.95rem;
+}
+.scan-row {
+  display: flex; max-width: 520px; margin: 0 auto;
+}
+.scan-input {
+  flex: 1; background: var(--bg); border: 1px solid var(--border);
+  border-right: none; padding: 18px 20px; color: var(--text);
+  font-family: var(--font-mono); font-size: 0.78rem; outline: none;
+  transition: border-color 0.4s;
+}
+.scan-input:focus { border-color: var(--border-hover); }
+.scan-input::placeholder { color: var(--text-muted); }
+.scan-go {
+  background: var(--text); color: var(--bg); border: 1px solid var(--text);
+  padding: 18px 36px; font-family: var(--font-display); font-weight: 700;
+  font-size: 0.78rem; letter-spacing: 0.12em; text-transform: uppercase;
+  cursor: pointer; transition: all 0.4s; white-space: nowrap;
+}
+.scan-go:hover { opacity: 0.85; }
+.scan-sub {
+  font-family: var(--font-mono); font-size: 0.55rem; color: var(--text-muted);
+  letter-spacing: 0.15em; margin-top: 16px;
+}
+.chain-btn {
+  background: transparent; border: 1px solid var(--border); color: var(--text-muted);
+  padding: 8px 18px; font-family: var(--font-mono); font-size: 0.65rem;
+  letter-spacing: 0.1em; cursor: pointer; transition: all 0.3s;
+}
+.chain-btn:hover { border-color: var(--border-hover); color: var(--text-secondary); }
+.chain-btn.active { border-color: var(--text-secondary); color: var(--text); background: var(--bg-surface); }
+#scan-result { margin-top: 28px; }
+
+/* ===== TOKEN ===== */
+.tok-hero {
+  display: flex; align-items: baseline; gap: 16px; margin-bottom: 8px;
+}
+.tok-sym {
+  font-family: var(--font-display); font-weight: 800; font-size: clamp(2.5rem, 4vw, 3.5rem);
+  color: var(--text);
+}
+.tok-chain {
+  font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-muted);
+  letter-spacing: 0.2em; text-transform: uppercase;
+}
+.tok-desc {
+  color: var(--text-secondary); font-weight: 300; line-height: 1.85;
+  max-width: 600px; margin-bottom: 64px;
+}
+
+.tok-tiers { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1px; }
+.tier {
+  background: var(--bg-elevated); border: 1px solid var(--border);
+  padding: 44px; transition: all 0.5s; position: relative;
+}
+.tier:hover { background: var(--bg-surface); }
+.tier.main { border-color: var(--border-hover); }
+.tier.main::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0;
+  height: 1px; background: var(--text-secondary);
+}
+.tier-name {
+  font-family: var(--font-mono); font-size: 0.55rem; color: var(--text-muted);
+  letter-spacing: 0.25em; text-transform: uppercase; margin-bottom: 20px;
+}
+.tier.main .tier-name { color: var(--text-secondary); }
+.tier-amt {
+  font-family: var(--font-mono); font-size: 1.8rem; font-weight: 500;
+  color: var(--text); margin-bottom: 4px;
+}
+.tier-unit {
+  font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-muted);
+  letter-spacing: 0.15em; margin-bottom: 28px;
+}
+.tier ul { list-style: none; }
+.tier li {
+  font-size: 0.82rem; color: var(--text-secondary); padding: 10px 0;
+  border-bottom: 1px solid var(--border); font-weight: 300;
+}
+.tier li:last-child { border-bottom: none; }
+
+.burn-row {
+  background: var(--bg-elevated); border: 1px solid var(--border);
+  padding: 44px; margin-top: 1px; display: flex; align-items: center; gap: 40px;
+}
+.burn-icon-wrap {
+  flex-shrink: 0; width: 64px; height: 64px;
+  border: 1px solid var(--border); border-radius: 50%;
+  display: grid; place-items: center;
+  font-family: var(--font-mono); font-size: 1.5rem; color: var(--text-secondary);
+}
+.burn-info h4 { font-family: var(--font-display); font-weight: 700; font-size: 1.1rem; margin-bottom: 8px; }
+.burn-info p { color: var(--text-secondary); font-weight: 300; line-height: 1.75; font-size: 0.88rem; }
+
+/* ===== ROADMAP ===== */
+.rm-list { position: relative; padding-left: 48px; }
+.rm-list::before {
+  content: ''; position: absolute; left: 6px; top: 8px; bottom: 8px;
+  width: 1px; background: linear-gradient(180deg, var(--text-secondary), var(--text-muted), transparent);
+}
+.rm-item { position: relative; margin-bottom: 56px; }
+.rm-item::before {
+  content: ''; position: absolute; left: -44px; top: 8px;
+  width: 5px; height: 5px; border-radius: 50%; background: var(--text-secondary);
+}
+.rm-item:last-child { margin-bottom: 0; }
+.rm-phase {
+  font-family: var(--font-mono); font-size: 0.55rem; color: var(--text-muted);
+  letter-spacing: 0.3em; text-transform: uppercase; margin-bottom: 10px;
+}
+.rm-item h4 { font-family: var(--font-display); font-weight: 700; font-size: 1.1rem; margin-bottom: 8px; }
+.rm-item p { color: var(--text-secondary); font-weight: 300; line-height: 1.75; font-size: 0.88rem; max-width: 600px; }
+
+/* ===== CTA ===== */
+.cta {
+  padding: 160px 48px; text-align: center;
+  max-width: 1080px; margin: 0 auto; position: relative; z-index: 1;
+}
+.cta h2 {
+  font-family: var(--font-display); font-weight: 800;
+  font-size: clamp(2rem, 4vw, 3.5rem); letter-spacing: -0.03em;
+  margin-bottom: 20px; line-height: 1.1;
+}
+.cta p {
+  color: var(--text-secondary); font-size: 1rem; font-weight: 300;
+  max-width: 400px; margin: 0 auto 48px; line-height: 1.8;
+}
+.cta-btns { display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; }
+
+/* ===== FOOTER ===== */
+footer {
+  border-top: 1px solid var(--border); padding: 40px 56px;
+  display: flex; justify-content: space-between; align-items: center;
+  max-width: 1080px; margin: 0 auto; position: relative; z-index: 1;
+}
+.foot-l { font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-muted); letter-spacing: 0.1em; }
+.foot-r { display: flex; gap: 28px; }
+.foot-r a {
+  font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-muted);
+  text-decoration: none; letter-spacing: 0.14em; text-transform: uppercase;
+  transition: color 0.4s;
+}
+.foot-r a:hover { color: var(--text-secondary); }
+
+/* ===== RESPONSIVE ===== */
+@media (max-width: 768px) {
+  nav { padding: 14px 24px; }
+  .nav-links { display: none; }
+  .hero { padding: 120px 24px 60px; }
+  .hero-ctas { flex-direction: column; align-items: center; }
+  .wrap { padding: 80px 24px; }
+  .ti-grid { grid-template-columns: 1fr 1fr; }
+  .chain-row { grid-template-columns: 120px 1fr 60px; }
+  .ch-risk { display: none; }
+  .edu-grid, .edu-steps, .tok-tiers { grid-template-columns: 1fr; }
+  .scan-row { flex-direction: column; }
+  .scan-input { border-right: 1px solid var(--border); border-bottom: none; }
+  .burn-row { flex-direction: column; text-align: center; }
+  .lb-top, .lb-bot { height: 2vh; }
+  footer { flex-direction: column; gap: 16px; text-align: center; padding: 30px 24px; }
+}
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+<div class="grain"></div>
+<div class="lb-top"></div>
+<div class="lb-bot"></div>
+
+<nav>
+  <a href="#" class="nav-logo">QSHIELD</a>
+  <ul class="nav-links">
+    <li><a href="#threat">Index</a></li>
+    <li><a href="#chains">Chains</a></li>
+    <li><a href="#learn">Learn</a></li>
+    <li><a href="#scanner">Scan</a></li>
+    <li><a href="#token">Token</a></li>
+  </ul>
+  <a href="#" class="nav-cta">Launch app</a>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-eyebrow"><span class="dot"></span>Quantum threat level: elevated</div>
+  <h1 class="hero-title">
+    <span class="title-line"><span class="title-inner">Your crypto</span></span>
+    <span class="title-line"><span class="title-inner title-dim">isn't safe</span></span>
+    <span class="title-line"><span class="title-inner">Forever.</span></span>
+  </h1>
+  <p class="hero-body">Quantum computers are advancing faster than crypto is adapting. QSHIELD tracks the real threat and tells you exactly when to act.</p>
+  <div class="hero-ctas">
+    <a href="#scanner" class="btn-main">Scan your wallet</a>
+    <a href="#threat" class="btn-outline">Threat index</a>
+  </div>
+</section>
+
+<!-- COUNTDOWN -->
+<div class="countdown">
+  <div class="cd-row">
+    <div class="cd-block"><div class="cd-num" id="cd-d">---</div><div class="cd-lbl">Days</div></div>
+    <div class="cd-colon">:</div>
+    <div class="cd-block"><div class="cd-num" id="cd-h">--</div><div class="cd-lbl">Hours</div></div>
+    <div class="cd-colon">:</div>
+    <div class="cd-block"><div class="cd-num" id="cd-m">--</div><div class="cd-lbl">Minutes</div></div>
+    <div class="cd-colon">:</div>
+    <div class="cd-block"><div class="cd-num" id="cd-s">--</div><div class="cd-lbl">Seconds</div></div>
+  </div>
+  <div class="cd-caption">Estimated until quantum-cryptographic viability</div>
+</div>
+
+<div class="line"></div>
+
+<!-- THREAT INDEX -->
+<div class="wrap" id="threat">
+  <div class="label r">Real-time analysis</div>
+  <h2 class="heading r rd1">Quantum threat index</h2>
+  <p class="intro r rd2">Aggregated from IBM Quantum roadmaps, Google research, NIST post-quantum standardization, and academic qubit tracking.</p>
+  
+  <div class="ti-card r rd3" id="ti-card">
+    <div class="ti-top">
+      <div class="ti-score">42 <span>/ 100</span></div>
+      <div class="ti-meta">
+        <div class="ti-level">Elevated</div>
+        <div class="ti-updated">Apr 01, 2026 · 06:00 UTC</div>
+      </div>
+    </div>
+    <div class="ti-bar">
+      <div class="ti-track"><div class="ti-fill" id="ti-fill"><div class="ti-marker"></div></div></div>
+      <div class="ti-labels"><span>Negligible</span><span>Low</span><span>Elevated</span><span>High</span><span>Critical</span></div>
+    </div>
+    <div class="ti-grid">
+      <div class="ti-fact"><div class="ti-fact-label">Logical qubits</div><div class="ti-fact-val">1,180</div></div>
+      <div class="ti-fact"><div class="ti-fact-label">Needed for ECDSA</div><div class="ti-fact-val">~4,000,000</div></div>
+      <div class="ti-fact"><div class="ti-fact-label">Error rate</div><div class="ti-fact-val">10⁻⁶</div></div>
+      <div class="ti-fact"><div class="ti-fact-label">NIST PQC status</div><div class="ti-fact-val">3 standards</div></div>
+      <div class="ti-fact"><div class="ti-fact-label">Research labs</div><div class="ti-fact-val">87 active</div></div>
+      <div class="ti-fact"><div class="ti-fact-label">Threat window</div><div class="ti-fact-val">2029 – 2035</div></div>
+    </div>
+  </div>
+</div>
+
+<div class="line"></div>
+
+<!-- CHAINS -->
+<div class="wrap" id="chains">
+  <div class="label r">Chain vulnerability</div>
+  <h2 class="heading r rd1">Post-quantum readiness</h2>
+  <p class="intro r rd2">Which chains are preparing, and which are sleepwalking into obsolescence.</p>
+  
+  <div class="chains-list">
+    <div class="chain-row r rd2"><div class="ch-name">Bitcoin</div><div class="ch-bar"><div class="ch-fill" data-w="15%"></div></div><div class="ch-pct">15%</div><div class="ch-risk">Critical</div></div>
+    <div class="chain-row r rd2"><div class="ch-name">Ethereum</div><div class="ch-bar"><div class="ch-fill" data-w="35%"></div></div><div class="ch-pct">35%</div><div class="ch-risk">High</div></div>
+    <div class="chain-row r rd3"><div class="ch-name">Solana</div><div class="ch-bar"><div class="ch-fill" data-w="10%"></div></div><div class="ch-pct">10%</div><div class="ch-risk">Critical</div></div>
+    <div class="chain-row r rd3"><div class="ch-name">Cardano</div><div class="ch-bar"><div class="ch-fill" data-w="40%"></div></div><div class="ch-pct">40%</div><div class="ch-risk">Moderate</div></div>
+    <div class="chain-row r rd4"><div class="ch-name">Algorand</div><div class="ch-bar"><div class="ch-fill" data-w="72%"></div></div><div class="ch-pct">72%</div><div class="ch-risk">Low</div></div>
+    <div class="chain-row r rd4"><div class="ch-name">QRL</div><div class="ch-bar"><div class="ch-fill" data-w="95%"></div></div><div class="ch-pct">95%</div><div class="ch-risk">Minimal</div></div>
+  </div>
+</div>
+
+<div class="line"></div>
+
+<!-- EDUCATION -->
+<div class="wrap" id="learn">
+  <div class="label r">Understanding the threat</div>
+  <h2 class="heading r rd1">Your address is not<br>your public key</h2>
+  <p class="intro r rd2">This distinction is the difference between quantum-safe and completely exposed. Most people don't know it exists.</p>
+  
+  <div class="edu-grid r rd3">
+    <div class="edu-card safe">
+      <div class="edu-tag">Receive only: protected</div>
+      <h4>Only the hash is visible</h4>
+      <p>When you share your wallet address, you're sharing a hashed version of your public key, not the key itself. Quantum computers can't reverse cryptographic hashes. Your funds stay safe.</p>
+      <div class="edu-code">Address = RIPEMD160(SHA256(public_key))<br>↳ One-way function · Cannot be reversed</div>
+    </div>
+    <div class="edu-card danger">
+      <div class="edu-tag">After sending: exposed</div>
+      <h4>Your real public key goes on-chain</h4>
+      <p>The moment you send a transaction, your signature reveals the actual public key. It's now permanently visible on the blockchain. A quantum computer running Shor's algorithm can derive your private key from it.</p>
+      <div class="edu-code">Transaction → Signature → Public Key exposed<br>↳ Shor's Algorithm → Private Key → Funds drained</div>
+    </div>
+  </div>
+  
+  <div class="edu-steps r rd4">
+    <div class="edu-step">
+      <div class="edu-step-n">01</div>
+      <h5>Harvest now</h5>
+      <p>Nation-states are already recording blockchain data and storing exposed public keys, waiting for quantum hardware to catch up.</p>
+    </div>
+    <div class="edu-step">
+      <div class="edu-step-n">02</div>
+      <h5>Decrypt later</h5>
+      <p>Once a quantum computer reaches sufficient qubit count with low error rates, every historically exposed key becomes crackable retroactively.</p>
+    </div>
+    <div class="edu-step">
+      <div class="edu-step-n">03</div>
+      <h5>Migrate before</h5>
+      <p>The only protection: move funds to fresh addresses that have never signed a transaction. QSHIELD monitors your exposure and tells you when to act.</p>
+    </div>
+  </div>
+</div>
+
+<div class="line"></div>
+
+<!-- SCANNER -->
+<div class="wrap" id="scanner">
+  <div class="label r">Exposure check</div>
+  <h2 class="heading r rd1">Wallet quantum scanner</h2>
+  <p class="intro r rd2">Analyze public key exposure across Bitcoin, Ethereum, Solana, and major L2s.</p>
+  
+  <div class="scan-card r rd3">
+    <div class="scan-rings">
+      <div class="scan-ring"></div>
+      <div class="scan-ring"></div>
+      <div class="scan-ring"></div>
+      <div class="scan-dot"></div>
+    </div>
+    <h3>Is your wallet exposed?</h3>
+    <p>Enter any address to analyze quantum-vulnerable public key exposure on-chain.</p>
+    <div style="display:flex;justify-content:center;gap:8px;margin-bottom:16px;flex-wrap:wrap;position:relative;z-index:1">
+      <button class="chain-btn active" data-chain="btc" onclick="pickChain(this)">BTC</button>
+      <button class="chain-btn" data-chain="eth" onclick="pickChain(this)">ETH</button>
+      <button class="chain-btn" data-chain="sol" onclick="pickChain(this)">SOL</button>
+      <button class="chain-btn" data-chain="base" onclick="pickChain(this)">Base</button>
+      <button class="chain-btn" data-chain="arb" onclick="pickChain(this)">Arbitrum</button>
+      <button class="chain-btn" data-chain="poly" onclick="pickChain(this)">Polygon</button>
+    </div>
+    <div class="scan-row">
+      <input type="text" class="scan-input" placeholder="Enter wallet address..." id="w-input" onkeydown="if(event.key==='Enter')scan()">
+      <button class="scan-go" onclick="scan()">Analyze</button>
+    </div>
+    <div class="scan-sub">Free · No sign-up · Instant results</div>
+    <div id="scan-result"></div>
+  </div>
+</div>
+
+<div class="line"></div>
+
+<!-- TOKEN -->
+<div class="wrap" id="token">
+  <div class="label r">Utility token</div>
+  <div class="tok-hero r rd1">
+    <div class="tok-sym">$QSHLD</div>
+    <div class="tok-chain">Solana SPL</div>
+  </div>
+  <p class="tok-desc r rd2">$QSHLD is the access key to the QSHIELD intelligence network. The basic exposure scan is free and always will be. Hold $QSHLD to unlock continuous monitoring, priority alerts, and migration tools. Premium features burn tokens on every use, making the supply permanently deflationary.</p>
+  
+  <div class="tok-tiers r rd3">
+    <div class="tier">
+      <div class="tier-name">Scout</div>
+      <div class="tier-amt">100</div>
+      <div class="tier-unit">$QSHLD held</div>
+      <ul>
+        <li>Basic wallet exposure scan</li>
+        <li>Weekly threat index digest</li>
+        <li>Community Telegram access</li>
+        <li>Chain readiness dashboard</li>
+      </ul>
+    </div>
+    <div class="tier main">
+      <div class="tier-name">Sentinel</div>
+      <div class="tier-amt">1,000</div>
+      <div class="tier-unit">$QSHLD held</div>
+      <ul>
+        <li>24/7 continuous wallet monitoring</li>
+        <li>Real-time threat alerts via Telegram</li>
+        <li>Personalized migration playbook</li>
+        <li>Priority exposure notifications</li>
+      </ul>
+    </div>
+    <div class="tier">
+      <div class="tier-name">Fortress</div>
+      <div class="tier-amt">10,000</div>
+      <div class="tier-unit">$QSHLD held</div>
+      <ul>
+        <li>White-glove migration assistance</li>
+        <li>Multi-wallet portfolio monitoring</li>
+        <li>Institutional threat briefings</li>
+        <li>Governance voting power</li>
+      </ul>
+    </div>
+  </div>
+  
+  <div class="burn-row r rd4">
+    <div class="burn-icon-wrap">◉</div>
+    <div class="burn-info">
+      <h4>Deflationary by design</h4>
+      <p>Every premium action (deep scans, migration reports, continuous monitoring) burns $QSHLD permanently on-chain. More users means more burns. The supply only goes down. No minting, no inflation, no team unlock schedule. Free basic scans stay free forever.</p>
+    </div>
+  </div>
+</div>
+
+<div class="line"></div>
+
+<!-- ROADMAP -->
+<div class="wrap" id="roadmap">
+  <div class="label r">Roadmap</div>
+  <h2 class="heading r rd1">The path forward</h2>
+  <p class="intro r rd2">Building the quantum threat intelligence layer for crypto.</p>
+  
+  <div class="rm-list">
+    <div class="rm-item r"><div class="rm-phase">Q2 2026</div><h4>Foundation</h4><p>Threat Index launch. Wallet Scanner MVP. $QSHLD on Solana. Community via Telegram & Twitter. Initial 6-chain assessment.</p></div>
+    <div class="rm-item r rd1"><div class="rm-phase">Q3 2026</div><h4>Intelligence</h4><p>AI-powered research ingestion. Premium alert system. Governance launch. Expand to 20+ chains. Academic partnerships.</p></div>
+    <div class="rm-item r rd2"><div class="rm-phase">Q4 2026</div><h4>Protection</h4><p>Quantum-safe migration tool. One-click wallet protection. B2B API for exchanges and custodians.</p></div>
+    <div class="rm-item r rd3"><div class="rm-phase">2027</div><h4>Defense protocol</h4><p>QSHIELD Vault for post-quantum secured custody. Cross-chain migration bridge. Quantum readiness certification standard.</p></div>
+  </div>
+  <div style="margin-top:40px"><a href="roadmap.html" style="font-family:var(--font-mono);font-size:0.7rem;color:var(--text-secondary);text-decoration:none;letter-spacing:0.12em;border-bottom:1px solid var(--border);padding-bottom:2px;transition:color 0.3s" onmouseover="this.style.color='var(--text)'" onmouseout="this.style.color='var(--text-secondary)'">View full roadmap →</a></div>
+</div>
+
+<div class="line"></div>
+
+<!-- CTA -->
+<div class="cta">
+  <h2 class="r">The clock is ticking.</h2>
+  <p class="r rd1">Join the quantum defense network before it's too late.</p>
+  <div class="cta-btns r rd2">
+    <a href="#" class="btn-main">Join Telegram</a>
+    <a href="#" class="btn-outline">Whitepaper</a>
+    <a href="#" class="btn-outline">Buy $QSHLD</a>
+  </div>
+</div>
+
+<div class="line"></div>
+
+<!-- DISCLAIMER -->
+<div class="wrap" style="padding:60px 48px">
+  <div style="border:1px solid var(--border);padding:32px;font-family:var(--font-mono);font-size:0.65rem;color:var(--text-muted);line-height:1.9;letter-spacing:0.02em">
+    <strong style="color:var(--text-secondary);letter-spacing:0.15em;text-transform:uppercase;font-size:0.6rem">Disclaimer</strong><br><br>
+    QSHIELD is an informational tool. The quantum threat index, chain readiness scores, and wallet scanner results are based on publicly available data and internal modeling. They do not constitute financial advice, investment recommendations, or guarantees of security. The $QSHLD token is a utility token that provides access to QSHIELD features. It is not a security, does not represent ownership in any entity, and carries no expectation of profit. Purchasing or holding $QSHLD involves risk, including total loss of funds. Cryptocurrency markets are volatile and unregulated in many jurisdictions. Always do your own research. Past performance of any system, methodology, or token does not guarantee future results. QSHIELD makes no representations about the accuracy or completeness of third-party data sources used in its threat modeling. The quantum computing timeline estimates are projections based on current research and may change significantly. By using this site and its tools, you acknowledge that you understand these risks and that QSHIELD bears no liability for any losses incurred.<br><br>
+    <a href="roadmap.html" style="color:var(--text-secondary);text-decoration:none;border-bottom:1px solid var(--border)">Full roadmap</a> &nbsp;·&nbsp; <a href="#" style="color:var(--text-secondary);text-decoration:none;border-bottom:1px solid var(--border)">Terms of use</a> &nbsp;·&nbsp; <a href="#" style="color:var(--text-secondary);text-decoration:none;border-bottom:1px solid var(--border)">Privacy policy</a>
+  </div>
+</div>
+
+<footer>
+  <div class="foot-l">© 2026 QSHIELD Protocol</div>
+  <div class="foot-r"><a href="#">Twitter</a><a href="#">Telegram</a><a href="#">GitHub</a><a href="#">Docs</a></div>
+</footer>
+
+<script>
+// ===== PARTICLES (very subtle) =====
+const c = document.getElementById('bg-canvas'), cx = c.getContext('2d');
+let W, H;
+function rs() { W = c.width = innerWidth; H = c.height = innerHeight; }
+addEventListener('resize', rs); rs();
+
+const pts = Array.from({length: Math.min(40, ~~(W*H/25000))}, () => ({
+  x: Math.random()*W, y: Math.random()*H,
+  vx: (Math.random()-0.5)*0.15, vy: (Math.random()-0.5)*0.15,
+  r: Math.random()*1.2+0.3, a: Math.random()*0.25+0.05
+}));
+
+function draw() {
+  cx.clearRect(0,0,W,H);
+  for (const p of pts) {
+    p.x += p.vx; p.y += p.vy;
+    if (p.x<0||p.x>W) p.vx*=-1;
+    if (p.y<0||p.y>H) p.vy*=-1;
+    cx.beginPath(); cx.arc(p.x,p.y,p.r,0,Math.PI*2);
+    cx.fillStyle = `rgba(160,160,176,${p.a})`; cx.fill();
+  }
+  for (let i=0;i<pts.length;i++) for (let j=i+1;j<pts.length;j++) {
+    const dx=pts[i].x-pts[j].x, dy=pts[i].y-pts[j].y, d=Math.sqrt(dx*dx+dy*dy);
+    if (d<140) {
+      cx.beginPath(); cx.moveTo(pts[i].x,pts[i].y); cx.lineTo(pts[j].x,pts[j].y);
+      cx.strokeStyle = `rgba(160,160,176,${(1-d/140)*0.04})`; cx.lineWidth=0.5; cx.stroke();
+    }
+  }
+  requestAnimationFrame(draw);
+}
+draw();
+
+// ===== COUNTDOWN =====
+function cd() {
+  const t = new Date('2029-06-01T00:00:00Z').getTime(), d = t - Date.now();
+  if (d<=0) return;
+  document.getElementById('cd-d').textContent = String(~~(d/864e5)).padStart(3,'0');
+  document.getElementById('cd-h').textContent = String(~~((d%864e5)/36e5)).padStart(2,'0');
+  document.getElementById('cd-m').textContent = String(~~((d%36e5)/6e4)).padStart(2,'0');
+  document.getElementById('cd-s').textContent = String(~~((d%6e4)/1e3)).padStart(2,'0');
+}
+cd(); setInterval(cd,1000);
+
+// ===== SCROLL REVEALS =====
+const obs = new IntersectionObserver(es => {
+  es.forEach(e => {
+    if (e.isIntersecting) {
+      e.target.classList.add('v');
+      if (e.target.id==='ti-card') setTimeout(()=>document.getElementById('ti-fill').classList.add('go'),400);
+      if (e.target.classList.contains('chain-row')) {
+        const f = e.target.querySelector('.ch-fill');
+        if (f) setTimeout(()=>f.style.width=f.dataset.w,200);
+      }
+    }
+  });
+}, {threshold:0.12});
+document.querySelectorAll('.r').forEach(el=>obs.observe(el));
+
+// ===== SCANNER =====
+const API = 'https://qshld-api-production.up.railway.app'; // Update after Railway deploy
+let selectedChain = 'btc';
+
+function pickChain(el) {
+  document.querySelectorAll('.chain-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  selectedChain = el.dataset.chain;
+  const ph = { btc:'1A1z... / 3... / bc1...', eth:'0x...', sol:'Base58 address...', base:'0x...', arb:'0x...', poly:'0x...' };
+  document.getElementById('w-input').placeholder = ph[selectedChain] || 'Enter address...';
+  document.getElementById('scan-result').innerHTML = '';
+}
+
+function box(h) { return `<div style="background:var(--bg);border:1px solid var(--border-hover);padding:32px;margin-top:16px;text-align:left">${h}</div>`; }
+function lbl(t) { return `<div style="font-family:var(--font-mono);font-size:0.55rem;color:var(--text-muted);letter-spacing:0.2em;text-transform:uppercase;margin-bottom:16px">${t}</div>`; }
+function ttl(t) { return `<div style="font-family:var(--font-display);font-weight:700;font-size:1.3rem;margin-bottom:16px">${t}</div>`; }
+function bdy(t) { return `<div style="color:var(--text-secondary);font-size:0.85rem;font-weight:300;line-height:1.75;margin-bottom:16px">${t}</div>`; }
+function ups(t) { return `<div style="font-family:var(--font-mono);font-size:0.65rem;color:var(--text-secondary);opacity:0.7">${t}</div>`; }
+function sts(items) {
+  return `<div style="display:flex;gap:32px;margin-bottom:20px;flex-wrap:wrap">${items.map(i =>
+    `<div><div style="font-family:var(--font-mono);font-size:0.55rem;color:var(--text-muted);letter-spacing:0.15em;text-transform:uppercase;margin-bottom:4px">${i.k}</div><div style="font-family:var(--font-mono);font-size:1rem;color:var(--text)">${i.v}</div></div>`
+  ).join('')}</div>`;
+}
+
+function renderResult(d) {
+  const statusMap = {
+    exposed: 'Exposed',
+    protected: 'Protected',
+    inherently_exposed: 'Inherently exposed',
+    contract: 'Contract address',
+    program: 'Program account'
+  };
+  const title = statusMap[d.status] || d.status;
+  const st = [];
+  if (d.outgoing_tx !== undefined) st.push({ k:'Outgoing tx', v:d.outgoing_tx.toLocaleString() });
+  if (d.total_tx !== undefined) st.push({ k:'Total tx', v:d.total_tx.toLocaleString() });
+  if (d.balance) st.push({ k:'Balance', v:d.balance });
+  if (d.total_received) st.push({ k:'Total received', v:d.total_received });
+  if (d.address_type) st.push({ k:'Address type', v:d.address_type });
+  if (d.type) st.push({ k:'Type', v:d.type });
+  if (d.public_key) st.push({ k:'Public key', v:d.public_key });
+  if (d.signature_scheme) st.push({ k:'Signature', v:d.signature_scheme });
+  if (d.has_activity !== undefined) st.push({ k:'Has activity', v:d.has_activity ? 'Yes' : 'No' });
+  const needsUpsell = d.status === 'exposed' || d.status === 'inherently_exposed';
+  return box(
+    lbl(`${d.chain} \u00b7 Scan complete`) +
+    ttl(title) +
+    (st.length ? sts(st) : '') +
+    bdy(d.detail) +
+    (needsUpsell ? ups('Hold $QSHLD for continuous monitoring & migration playbook \u2192') : '')
+  );
+}
+
+async function scan() {
+  const v = document.getElementById('w-input').value.trim();
+  const r = document.getElementById('scan-result');
+  if (!v) {
+    r.innerHTML = '<div style="color:var(--text-muted);font-family:var(--font-mono);font-size:0.75rem;margin-top:16px">Enter a valid address.</div>';
+    return;
+  }
+  const chainNames = { btc:'Bitcoin', eth:'Ethereum', sol:'Solana', base:'Base', arb:'Arbitrum', poly:'Polygon' };
+  r.innerHTML = `<div style="color:var(--text-secondary);font-family:var(--font-mono);font-size:0.75rem;margin-top:16px">Querying ${chainNames[selectedChain]} blockchain...</div>`;
+  try {
+    const res = await fetch(`${API}/api/scan?address=${encodeURIComponent(v)}&chain=${selectedChain}`);
+    const data = await res.json();
+    if (data.error) { r.innerHTML = box(lbl('Error') + bdy(data.error)); return; }
+    r.innerHTML = renderResult(data);
+  } catch (err) {
+    r.innerHTML = box(lbl('Error') + bdy('Could not reach scanner. Try again in a moment.'));
+  }
+}
+
+</script>
+</body>
+</html>

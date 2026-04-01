@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>QSHIELD // Roadmap</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500&family=Syne:wght@400;500;600;700;800&family=Outfit:wght@200;300;400;500;600&display=swap" rel="stylesheet">
+<style>
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+:root {
+  --bg: #050506; --bg-el: #0a0a0c; --bg-sf: #0e0e11;
+  --border: #18181e; --border-h: #25252e;
+  --text: #d8d8e0; --text-s: #6a6a7a; --text-m: #3a3a48;
+  --font-d: 'Syne', sans-serif;
+  --font-b: 'Outfit', sans-serif;
+  --font-m: 'JetBrains Mono', monospace;
+}
+html { scroll-behavior: smooth; }
+body { background: var(--bg); color: var(--text); font-family: var(--font-b); -webkit-font-smoothing: antialiased; }
+
+.grain {
+  position: fixed; inset: 0; z-index: 9999; pointer-events: none; opacity: 0.4;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.018'/%3E%3C/svg%3E");
+}
+.lb-top, .lb-bot { position: fixed; left: 0; right: 0; z-index: 9998; pointer-events: none; background: #000; }
+.lb-top { top: 0; height: 3.5vh; }
+.lb-bot { bottom: 0; height: 3.5vh; }
+
+nav {
+  position: fixed; top: 3.5vh; left: 0; right: 0; z-index: 1000;
+  padding: 20px 56px; display: flex; justify-content: space-between; align-items: center;
+  backdrop-filter: blur(40px) saturate(1.1); background: rgba(5,5,6,0.65);
+  border-bottom: 1px solid var(--border);
+}
+.nav-logo { font-family: var(--font-d); font-weight: 800; font-size: 1.15rem; letter-spacing: 0.2em; color: var(--text); text-decoration: none; }
+.nav-back {
+  font-family: var(--font-m); font-size: 0.7rem; color: var(--text-s);
+  text-decoration: none; letter-spacing: 0.1em; transition: color 0.3s;
+}
+.nav-back:hover { color: var(--text); }
+
+.wrap { max-width: 780px; margin: 0 auto; padding: 160px 48px 80px; }
+.line { max-width: 780px; margin: 0 auto; height: 1px; background: var(--border); }
+
+h1 {
+  font-family: var(--font-d); font-weight: 800;
+  font-size: clamp(2rem, 4vw, 3rem); letter-spacing: -0.03em;
+  margin-bottom: 20px; line-height: 1.1;
+}
+.intro {
+  color: var(--text-s); font-size: 1rem; font-weight: 300;
+  line-height: 1.85; margin-bottom: 16px;
+}
+.updated {
+  font-family: var(--font-m); font-size: 0.6rem; color: var(--text-m);
+  letter-spacing: 0.15em; margin-bottom: 72px;
+}
+
+/* Phase blocks */
+.phase { margin-bottom: 64px; }
+.phase-header {
+  display: flex; align-items: baseline; gap: 16px;
+  margin-bottom: 24px; flex-wrap: wrap;
+}
+.phase-tag {
+  font-family: var(--font-m); font-size: 0.6rem; color: var(--text-s);
+  letter-spacing: 0.25em; text-transform: uppercase;
+}
+.phase-status {
+  font-family: var(--font-m); font-size: 0.55rem; letter-spacing: 0.15em;
+  text-transform: uppercase; padding: 3px 10px; border: 1px solid var(--border);
+}
+.status-active { color: var(--text); border-color: var(--text-s); }
+.status-next { color: var(--text-s); }
+.status-planned { color: var(--text-m); }
+
+.phase h2 {
+  font-family: var(--font-d); font-weight: 700; font-size: 1.3rem;
+  margin-bottom: 16px;
+}
+.phase p {
+  color: var(--text-s); font-weight: 300; line-height: 1.85;
+  font-size: 0.92rem; margin-bottom: 12px;
+}
+
+.deliverables {
+  margin-top: 20px; display: flex; flex-direction: column; gap: 1px;
+}
+.deliverable {
+  background: var(--bg-el); border: 1px solid var(--border);
+  padding: 16px 24px; display: flex; justify-content: space-between;
+  align-items: center; font-size: 0.85rem; color: var(--text-s);
+  font-weight: 300;
+}
+.deliverable .d-status {
+  font-family: var(--font-m); font-size: 0.55rem; color: var(--text-m);
+  letter-spacing: 0.12em; text-transform: uppercase;
+}
+.d-done { color: var(--text-s) !important; }
+
+/* Disclaimer */
+.disclaimer {
+  border: 1px solid var(--border); padding: 32px;
+  font-family: var(--font-m); font-size: 0.6rem;
+  color: var(--text-m); line-height: 1.9; letter-spacing: 0.02em;
+  margin-top: 48px;
+}
+.disclaimer strong {
+  color: var(--text-s); letter-spacing: 0.15em;
+  text-transform: uppercase; font-size: 0.55rem;
+}
+
+footer {
+  border-top: 1px solid var(--border); padding: 40px 56px;
+  display: flex; justify-content: space-between; align-items: center;
+  max-width: 780px; margin: 0 auto; flex-wrap: wrap; gap: 16px;
+}
+.foot-l { font-family: var(--font-m); font-size: 0.6rem; color: var(--text-m); }
+.foot-r { display: flex; gap: 24px; }
+.foot-r a {
+  font-family: var(--font-m); font-size: 0.6rem; color: var(--text-m);
+  text-decoration: none; letter-spacing: 0.12em; text-transform: uppercase;
+  transition: color 0.3s;
+}
+.foot-r a:hover { color: var(--text-s); }
+
+@media (max-width: 768px) {
+  nav { padding: 14px 24px; }
+  .wrap { padding: 120px 24px 60px; }
+  footer { flex-direction: column; text-align: center; padding: 30px 24px; }
+}
+</style>
+</head>
+<body>
+
+<div class="grain"></div>
+<div class="lb-top"></div>
+<div class="lb-bot"></div>
+
+<nav>
+  <a href="index.html" class="nav-logo">QSHIELD</a>
+  <a href="index.html" class="nav-back">← Back to main</a>
+</nav>
+
+<div class="wrap">
+  <h1>Roadmap</h1>
+  <p class="intro">This is what we're building and roughly when. We ship fast and adjust based on what we learn. No promises on exact dates, only on direction.</p>
+  <div class="updated">Last updated: April 2026</div>
+
+  <!-- PHASE 1 -->
+  <div class="phase">
+    <div class="phase-header">
+      <span class="phase-tag">Q2 2026</span>
+      <span class="phase-status status-active">In progress</span>
+    </div>
+    <h2>Foundation</h2>
+    <p>Get the core product live: a working scanner, a credible threat index, and a community that cares about quantum risk before anyone else does.</p>
+    <div class="deliverables">
+      <div class="deliverable">Quantum threat index (live score, 6 data sources)<div class="d-status d-done">Done</div></div>
+      <div class="deliverable">Multi-chain wallet scanner (BTC, ETH, SOL, Base, Arbitrum, Polygon)<div class="d-status d-done">Done</div></div>
+      <div class="deliverable">Chain readiness scores for top 6 networks<div class="d-status d-done">Done</div></div>
+      <div class="deliverable">$QSHLD token launch on Solana<div class="d-status">Q2 2026</div></div>
+      <div class="deliverable">Telegram community and Twitter presence<div class="d-status">Q2 2026</div></div>
+      <div class="deliverable">Landing page and public dashboard<div class="d-status d-done">Done</div></div>
+    </div>
+  </div>
+
+  <!-- PHASE 2 -->
+  <div class="phase">
+    <div class="phase-header">
+      <span class="phase-tag">Q3 2026</span>
+      <span class="phase-status status-next">Next</span>
+    </div>
+    <h2>Intelligence network</h2>
+    <p>Turn QSHIELD from a scanner into a real-time intelligence platform. Automate data ingestion, launch premium features, and start generating revenue through the token.</p>
+    <div class="deliverables">
+      <div class="deliverable">AI-powered research paper ingestion pipeline<div class="d-status">Q3 2026</div></div>
+      <div class="deliverable">Premium tier: continuous wallet monitoring via Telegram<div class="d-status">Q3 2026</div></div>
+      <div class="deliverable">$QSHLD burn mechanism on premium actions<div class="d-status">Q3 2026</div></div>
+      <div class="deliverable">Governance voting for chain readiness ratings<div class="d-status">Q3 2026</div></div>
+      <div class="deliverable">Expand coverage to 20+ chains<div class="d-status">Q3 2026</div></div>
+    </div>
+  </div>
+
+  <!-- PHASE 3 -->
+  <div class="phase">
+    <div class="phase-header">
+      <span class="phase-tag">Q4 2026</span>
+      <span class="phase-status status-planned">Planned</span>
+    </div>
+    <h2>Protection tools</h2>
+    <p>Move from telling people they're exposed to actively helping them fix it. Migration tools, one-click protection, and an API for businesses that need this data.</p>
+    <div class="deliverables">
+      <div class="deliverable">Quantum-safe wallet migration tool<div class="d-status">Q4 2026</div></div>
+      <div class="deliverable">One-click address rotation for major wallets<div class="d-status">Q4 2026</div></div>
+      <div class="deliverable">B2B API for exchanges and custodians<div class="d-status">Q4 2026</div></div>
+      <div class="deliverable">Institutional threat reports (PDF/dashboard)<div class="d-status">Q4 2026</div></div>
+    </div>
+  </div>
+
+  <!-- PHASE 4 -->
+  <div class="phase">
+    <div class="phase-header">
+      <span class="phase-tag">2027</span>
+      <span class="phase-status status-planned">Planned</span>
+    </div>
+    <h2>Defense protocol</h2>
+    <p>The endgame: a post-quantum custody solution and cross-chain migration infrastructure. This only gets built if the earlier phases prove there's real demand.</p>
+    <div class="deliverables">
+      <div class="deliverable">QSHIELD Vault: post-quantum secured asset custody<div class="d-status">2027</div></div>
+      <div class="deliverable">Cross-chain migration bridge<div class="d-status">2027</div></div>
+      <div class="deliverable">Quantum readiness certification standard<div class="d-status">2027</div></div>
+    </div>
+  </div>
+
+  <div class="disclaimer">
+    <strong>Disclaimer</strong><br><br>
+    This roadmap reflects current plans and priorities as of April 2026. Timelines are estimates, not commitments. Development priorities may shift based on quantum computing developments, community feedback, and market conditions. Features listed as "planned" are subject to change or cancellation. Nothing on this page constitutes a promise, guarantee, or binding obligation. The $QSHLD token is a utility token and not a security. Purchasing tokens based on roadmap expectations involves significant risk, including total loss. Always do your own research.
+  </div>
+</div>
+
+<div class="line"></div>
+
+<footer>
+  <div class="foot-l">&copy; 2026 QSHIELD Protocol</div>
+  <div class="foot-r"><a href="#">Twitter</a><a href="#">Telegram</a><a href="#">GitHub</a><a href="#">Docs</a></div>
+</footer>
+
+</body>
+</html>

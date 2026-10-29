@@ -16,15 +16,15 @@
 <meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="QSHIELD: Your private key has an expiry date. Scan any wallet at qshld.tech">
 <meta property="og:site_name" content="QSHIELD">
+<meta property="og:locale" content="en_US">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="QSHIELD | Your private key has an expiry date">
 <meta name="twitter:description" content="Scan any wallet. See if its public key is already on-chain for a quantum computer to find.">
 <meta name="twitter:image" content="https://qshld.tech/og-image.png">
-<meta property="og:image:alt" content="QSHIELD: Your private key has an expiry date. Scan any wallet at qshld.tech">
-<meta property="og:locale" content="en_US">
 <meta name="twitter:image:alt" content="QSHIELD: Your private key has an expiry date. Scan any wallet at qshld.tech">
-<meta name="theme-color" content="#03050A">
+<meta name="theme-color" content="#020306">
 <meta name="color-scheme" content="dark">
 <meta name="application-name" content="QSHIELD">
 <meta name="apple-mobile-web-app-title" content="QSHIELD">
@@ -37,31 +37,21 @@
 <link rel="icon" href="/favicon-16x16.png" type="image/png" sizes="16x16">
 <link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
 <link rel="manifest" href="/site.webmanifest">
-<link rel="preload" href="assets/qs.css" as="style">
+<link rel="preload" href="assets/fonts/clash-600.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="assets/fonts/satoshi-400.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="preload" href="media/hero.jpg" as="image">
+<link rel="stylesheet" href="assets/qs.css">
 <script type="application/ld+json">
 {"@context":"https://schema.org","@type":"WebApplication","name":"QSHIELD","url":"https://qshld.tech/","description":"Free, read only scanner that checks if a crypto wallet's public key is exposed to future quantum computers. Supports Bitcoin, Ethereum, Solana, Base, Arbitrum and Polygon.","applicationCategory":"SecurityApplication","operatingSystem":"Web","offers":{"@type":"Offer","price":"0","priceCurrency":"USD"},"image":"https://qshld.tech/og-image.png"}
 </script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="assets/qs.css">
 </head>
 <body>
 
-<div class="boot" id="boot" aria-hidden="true">
-  <div class="boot-in">
-    <img src="assets/logo-128.png" alt="" class="boot-logo">
-    <div class="boot-line"><span id="boot-txt">Cooling to 15 millikelvin</span></div>
-    <div class="boot-bar"><i id="boot-bar"></i></div>
-  </div>
-</div>
-
-<div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+<div class="intro" id="intro" aria-hidden="true"><div class="intro-in"><img src="assets/logo-128.png" alt=""><div class="intro-line"><i></i></div></div></div>
 <div class="grain" aria-hidden="true"></div>
-<canvas id="spark" aria-hidden="true"></canvas>
 <div class="progress" aria-hidden="true"><i id="progress"></i></div>
 
-<header class="nav-wrap">
+<header class="nav-wrap" id="navwrap">
   <nav class="nav" aria-label="Main">
     <a href="#top" class="brand"><img src="assets/logo-128.png" alt="" width="30" height="30"><span>QSHIELD</span></a>
     <ul class="nav-links">
@@ -71,200 +61,109 @@
       <li><a href="#token">$QSHLD</a></li>
       <li><a href="docs.html">Docs</a></li>
     </ul>
-    <a href="#top" class="nav-cta" data-focus-scan>Scan wallet</a>
+    <a href="#top" class="btn btn-gold" data-focus-scan>Scan wallet</a>
   </nav>
 </header>
 
 <main id="top">
 
-<!-- HERO -->
-<section class="hero">
-  <video class="bgvid" data-src="qs-hero.mp4" muted loop playsinline preload="none" aria-hidden="true"></video>
-  <canvas id="qubit" aria-hidden="true"></canvas>
-  <div class="hero-shade" aria-hidden="true"></div>
-
+<section class="hero" id="hero">
+  <div class="media"><img src="media/hero.jpg" alt=""><video data-src="media/hero.mp4" data-eager muted loop playsinline preload="none" aria-hidden="true"></video></div>
+  <div class="hero-veil" aria-hidden="true"></div>
+  <div class="hero-tint" aria-hidden="true"></div>
   <div class="hero-in">
-    <a class="pill" href="#countdown"><span class="pulse"></span>Q-Day monitor online</a>
-    <h1 class="hero-title">
-      <span class="ln"><span>Your private key</span></span>
-      <span class="ln"><span class="shiny">has an expiry date.</span></span>
-    </h1>
-    <p class="hero-sub">Every time you send crypto, your public key lands on-chain for good. A large enough quantum computer turns that key back into your private key. Scan any wallet and see where it stands.</p>
+    <div class="eyebrow rv"><i></i>Q-Day monitor online</div>
+    <h1 class="h-xl split" data-split>Your private key has an <span class="gold-text">expiry date.</span></h1>
+    <p class="lede rv" style="--d:.35s">Every time you send crypto, your public key lands on-chain for good. A large enough quantum computer turns it back into your private key. Find out where your wallet stands.</p>
 
-    <form class="scanner" id="scanner" autocomplete="off" novalidate>
+    <form class="scanner rv" style="--d:.5s" id="scanner" autocomplete="off" novalidate>
       <div class="chains" role="radiogroup" aria-label="Chain">
-        <button type="button" class="chip on" data-chain="btc" role="radio" aria-checked="true">BTC</button>
-        <button type="button" class="chip" data-chain="eth" role="radio" aria-checked="false">ETH</button>
-        <button type="button" class="chip" data-chain="sol" role="radio" aria-checked="false">SOL</button>
+        <button type="button" class="chip on" data-chain="btc" role="radio" aria-checked="true">Bitcoin</button>
+        <button type="button" class="chip" data-chain="eth" role="radio" aria-checked="false">Ethereum</button>
+        <button type="button" class="chip" data-chain="sol" role="radio" aria-checked="false">Solana</button>
         <button type="button" class="chip" data-chain="base" role="radio" aria-checked="false">Base</button>
         <button type="button" class="chip" data-chain="arb" role="radio" aria-checked="false">Arbitrum</button>
         <button type="button" class="chip" data-chain="poly" role="radio" aria-checked="false">Polygon</button>
       </div>
       <div class="scan-row">
         <label class="sr" for="addr">Wallet address</label>
-        <input id="addr" class="scan-input" type="text" spellcheck="false" placeholder="Paste a Bitcoin address (1..., 3... or bc1...)">
-        <button class="scan-btn" type="submit"><span>Scan wallet</span></button>
+        <input id="addr" class="scan-input" type="text" spellcheck="false" placeholder="Paste a Bitcoin address">
+        <button class="btn btn-gold" type="submit">Scan wallet</button>
       </div>
-      <p class="scan-note">Free, no sign-up, read only. We never ask for keys, seed phrases or signatures.</p>
+      <p class="scan-note">Free and read only. We never ask for keys, seed phrases or signatures.</p>
     </form>
+    <div class="report-wrap" id="report-wrap" hidden><div class="report" id="report" aria-live="polite"></div></div>
   </div>
-
-  <div class="report-wrap" id="report-wrap" hidden>
-    <div class="report" id="report" aria-live="polite"></div>
-  </div>
-
-  <a href="#how" class="scroll-cue" aria-label="Scroll to how it works"><span></span></a>
 </section>
 
-<!-- MARQUEE -->
-<div class="marquee" aria-hidden="true">
-  <div class="mq-track">
-    <span>Shor's algorithm</span><span>secp256k1</span><span>Ed25519</span><span>ECDSA</span><span>Schnorr</span><span>ML-DSA / FIPS 204</span><span>SLH-DSA / FIPS 205</span><span>ML-KEM / FIPS 203</span><span>Winternitz one-time signatures</span><span>Surface code</span><span>Logical qubits</span><span>Grover's algorithm</span><span>Lattice cryptography</span><span>Harvest now, decrypt later</span>
-    <span>Shor's algorithm</span><span>secp256k1</span><span>Ed25519</span><span>ECDSA</span><span>Schnorr</span><span>ML-DSA / FIPS 204</span><span>SLH-DSA / FIPS 205</span><span>ML-KEM / FIPS 203</span><span>Winternitz one-time signatures</span><span>Surface code</span><span>Logical qubits</span><span>Grover's algorithm</span><span>Lattice cryptography</span><span>Harvest now, decrypt later</span>
-  </div>
-</div>
+<div class="ticker" aria-hidden="true"><div class="tk">
+  <span>Shor's algorithm</span><span>secp256k1</span><span>Ed25519</span><span>ECDSA</span><span>Schnorr</span><span>ML-DSA</span><span>SLH-DSA</span><span>ML-KEM</span><span>Winternitz signatures</span><span>Surface code</span><span>Logical qubits</span><span>Lattice cryptography</span><span>Harvest now, decrypt later</span>
+  <span>Shor's algorithm</span><span>secp256k1</span><span>Ed25519</span><span>ECDSA</span><span>Schnorr</span><span>ML-DSA</span><span>SLH-DSA</span><span>ML-KEM</span><span>Winternitz signatures</span><span>Surface code</span><span>Logical qubits</span><span>Lattice cryptography</span><span>Harvest now, decrypt later</span>
+</div></div>
 
-<!-- COUNTDOWN -->
-<section class="countdown" id="countdown">
-  <h2 class="cd-title rv">Earliest public estimate for Q-Day</h2>
-  <div class="cd-digits rv" style="--d:.1s" role="timer" aria-label="Countdown to June 2029">
-    <div class="cd-cell"><b id="cd-d">0000</b><small>days</small></div>
-    <div class="cd-cell"><b id="cd-h">00</b><small>hours</small></div>
-    <div class="cd-cell"><b id="cd-m">00</b><small>minutes</small></div>
-    <div class="cd-cell"><b id="cd-s">00</b><small>seconds</small></div>
-  </div>
-  <p class="cd-sub rv" style="--d:.2s">Q-Day is the day a quantum computer can break the signatures crypto runs on. Public estimates range from 2029 to 2035. We count down to the earliest one, because that is the one you plan for.</p>
-</section>
-
-<!-- STORY: PINNED HORIZONTAL SLIDES -->
 <section class="story" id="how">
   <div class="story-pin">
-    <div class="story-head">
-      <h2>How a wallet gets drained after Q-Day</h2>
-      <div class="story-dots" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i></div>
+    <div class="layer" data-layer="0"><div class="media"><img src="media/step1.jpg" alt="" loading="lazy"><video data-src="media/step1.mp4" muted loop playsinline preload="none" aria-hidden="true"></video></div></div>
+    <div class="layer" data-layer="1"><div class="media"><img src="media/step2.jpg" alt="" loading="lazy"><video data-src="media/step2.mp4" muted loop playsinline preload="none" aria-hidden="true"></video></div></div>
+    <div class="layer" data-layer="2"><div class="media"><img src="media/step3.jpg" alt="" loading="lazy"><video data-src="media/step3.mp4" muted loop playsinline preload="none" aria-hidden="true"></video></div></div>
+    <div class="layer" data-layer="3"><div class="media"><img src="media/step4.jpg" alt="" loading="lazy"><video data-src="media/step4.mp4" muted loop playsinline preload="none" aria-hidden="true"></video></div></div>
+    <div class="layer" data-layer="4"><div class="media"><img src="media/step5.jpg" alt="" loading="lazy"><video data-src="media/step5.mp4" muted loop playsinline preload="none" aria-hidden="true"></video></div></div>
+
+    <div class="story-title">How a wallet gets drained after Q-Day</div>
+    <div class="story-copy">
+      <article class="chapter on"><div class="num">01</div><h3>You send a transaction.</h3><p>To sign it, your wallet publishes your public key. Until that moment the chain only knew a hash of it, and a hash cannot be reversed.</p><code>tx.sign(privateKey) reveals publicKey</code></article>
+      <article class="chapter"><div class="num">02</div><h3>The key stays public forever.</h3><p>Blockchains never forget. Every key revealed since 2009 sits in plain sight, indexed and searchable by anyone who runs a node.</p><code>exposed keys on ledger: all of them</code></article>
+      <article class="chapter"><div class="num">03</div><h3>Harvest now, decrypt later.</h3><p>Nobody has to hack anything today. The data is already public. An attacker only needs to wait for the hardware to arrive.</p><code>wait(until: faultTolerantQC)</code></article>
+      <article class="chapter"><div class="num">04</div><h3>Shor's algorithm runs.</h3><p>A fault tolerant quantum computer solves the elliptic curve problem behind ECDSA and Ed25519. Public key goes in, private key comes out.</p><code>shor(publicKey) returns privateKey</code></article>
+      <article class="chapter"><div class="num">05</div><h3>Move before it happens.</h3><p>Funds on an address that never signed anything still hide behind a hash. On Solana the address is the public key, so every SOL wallet is exposed by design.</p><a href="#top" class="btn btn-gold" data-focus-scan>Scan your wallet</a></article>
     </div>
-    <div class="story-track" id="story-track">
-
-      <article class="slide">
-        <div class="slide-media">
-          <video class="slidevid" data-src="qs-step1.mp4" muted loop playsinline preload="none" aria-hidden="true"></video>
-          <div class="viz viz-sign" aria-hidden="true">
-            <div class="vz-key">private key</div>
-            <div class="vz-beam"></div>
-            <div class="vz-tx">signed tx<br><em>public key attached</em></div>
-          </div>
-        </div>
-        <div class="slide-copy">
-          <span class="step">Step 1</span>
-          <h3>You send a transaction</h3>
-          <p>To sign it, your wallet publishes your public key. Until that moment the chain only knew a hash of it, and a hash cannot be reversed.</p>
-          <code>tx.sign(privateKey) reveals publicKey</code>
-        </div>
-      </article>
-
-      <article class="slide">
-        <div class="slide-media">
-          <video class="slidevid" data-src="qs-step2.mp4" muted loop playsinline preload="none" aria-hidden="true"></video>
-          <div class="viz viz-ledger" aria-hidden="true">
-            <div class="ledger" id="ledger"></div>
-          </div>
-        </div>
-        <div class="slide-copy">
-          <span class="step">Step 2</span>
-          <h3>The key stays public forever</h3>
-          <p>Blockchains never forget. Every key revealed since 2009 sits in plain sight, indexed and searchable by anyone who runs a node.</p>
-          <code>exposed keys on ledger: all of them</code>
-        </div>
-      </article>
-
-      <article class="slide">
-        <div class="slide-media">
-          <video class="slidevid" data-src="qs-step3.mp4" muted loop playsinline preload="none" aria-hidden="true"></video>
-          <div class="viz viz-harvest" aria-hidden="true">
-            <div class="vault-grid"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div>
-          </div>
-        </div>
-        <div class="slide-copy">
-          <span class="step">Step 3</span>
-          <h3>Harvest now, decrypt later</h3>
-          <p>Nobody has to hack anything today. The data is already public. An attacker only needs to wait for the hardware to arrive.</p>
-          <code>wait(until: faultTolerantQC)</code>
-        </div>
-      </article>
-
-      <article class="slide">
-        <div class="slide-media">
-          <video class="slidevid" data-src="qs-step4.mp4" muted loop playsinline preload="none" aria-hidden="true"></video>
-          <div class="viz viz-shor" aria-hidden="true">
-            <div class="wave w1"></div><div class="wave w2"></div><div class="wave w3"></div>
-            <div class="shor-out">private key recovered</div>
-          </div>
-        </div>
-        <div class="slide-copy">
-          <span class="step">Step 4</span>
-          <h3>Shor's algorithm runs</h3>
-          <p>A fault tolerant quantum computer solves the elliptic curve problem behind ECDSA and Ed25519. Public key goes in, private key comes out.</p>
-          <code>shor(publicKey) returns privateKey</code>
-        </div>
-      </article>
-
-      <article class="slide">
-        <div class="slide-media">
-          <video class="slidevid" data-src="qs-step5.mp4" muted loop playsinline preload="none" aria-hidden="true"></video>
-          <div class="viz viz-shield" aria-hidden="true">
-            <img src="assets/logo.png" alt="">
-          </div>
-        </div>
-        <div class="slide-copy">
-          <span class="step">Step 5</span>
-          <h3>Move before it happens</h3>
-          <p>Funds on an address that has never signed anything still hide behind a hash. Solana works differently: the address is the public key, so every SOL wallet is exposed by design.</p>
-          <a href="#top" class="btn-copper" data-focus-scan>Scan your wallet</a>
-        </div>
-      </article>
-
-    </div>
+    <div class="rail" aria-hidden="true"><button data-go="0" class="on">Sign<i></i></button><button data-go="1">Exposed<i></i></button><button data-go="2">Harvest<i></i></button><button data-go="3">Break<i></i></button><button data-go="4">Protect<i></i></button></div>
   </div>
 </section>
 
-<!-- THREAT INDEX -->
+<section class="cd" id="countdown">
+  <div class="media"><img src="media/final.jpg" alt="" loading="lazy"><video data-src="media/final.mp4" muted loop playsinline preload="none" aria-hidden="true"></video></div>
+  <div class="cd-in">
+    <div class="eyebrow rv"><i></i>Earliest public estimate for Q-Day</div>
+    <div class="cd-digits rv" style="--d:.1s" role="timer" aria-label="Countdown to June 2029">
+      <div class="cd-cell"><b id="cd-d">000</b><small>days</small></div><span class="cd-sep">:</span>
+      <div class="cd-cell"><b id="cd-h">00</b><small>hours</small></div><span class="cd-sep">:</span>
+      <div class="cd-cell"><b id="cd-m">00</b><small>minutes</small></div><span class="cd-sep">:</span>
+      <div class="cd-cell"><b id="cd-s">00</b><small>seconds</small></div>
+    </div>
+    <p class="rv" style="--d:.2s">Q-Day is the day a quantum computer can break the signatures crypto runs on. Public estimates range from 2029 to 2035. We count down to the earliest one, because that is the one you plan for.</p>
+  </div>
+</section>
+
 <section class="sec" id="index">
   <div class="sec-head">
-    <h2 class="rv">Quantum threat index</h2>
-    <p class="rv" style="--d:.1s">Our score for how close quantum hardware is to breaking crypto signatures. Built from public hardware roadmaps, NIST standards and peer reviewed resource estimates.</p>
+    <h2 class="h-lg split" data-split>Quantum threat index</h2>
+    <p class="rv">Our score for how close quantum hardware is to breaking crypto signatures. Built from public hardware roadmaps, NIST standards and peer reviewed resource estimates.</p>
   </div>
-
   <div class="ti">
-    <div class="gauge rv" style="--d:.1s">
-      <svg viewBox="0 0 220 220" aria-hidden="true">
-        <defs>
-          <linearGradient id="gg" x1="0" y1="0" x2="1" y2="1">
-            <stop offset="0" stop-color="#8FE3FF"/><stop offset=".6" stop-color="#D9A25F"/><stop offset="1" stop-color="#FF4D5E"/>
-          </linearGradient>
-        </defs>
-        <circle cx="110" cy="110" r="92" class="g-bg"/>
-        <circle cx="110" cy="110" r="92" class="g-fg" id="g-fg" pathLength="100"/>
+    <div class="gauge rv" id="gauge">
+      <svg viewBox="0 0 200 200" aria-hidden="true">
+        <defs><linearGradient id="gg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#8FE3FF"/><stop offset=".55" stop-color="#F3D19C"/><stop offset="1" stop-color="#FF4D5E"/></linearGradient></defs>
+        <circle cx="100" cy="100" r="96" class="g-ticks" pathLength="100"/>
+        <circle cx="100" cy="100" r="86" class="g-bg"/>
+        <circle cx="100" cy="100" r="86" class="g-fg" id="g-fg" pathLength="100"/>
       </svg>
-      <div class="g-num"><b class="count" data-to="42">0</b><span>of 100</span></div>
-      <div class="g-lvl">Elevated</div>
+      <div class="g-num"><div><b class="count" data-to="42">0</b><span>of 100</span><em>Elevated</em></div></div>
     </div>
-
     <div class="facts">
-      <div class="fact spot rv" style="--d:.05s"><b class="count" data-to="2330" data-prefix="~">0</b><span>logical qubits estimated to break 256-bit elliptic curve keys</span></div>
-      <div class="fact spot rv" style="--d:.1s"><b class="count" data-to="25" data-prefix="~" data-suffix="%">0</b><span>of all bitcoin sits on addresses with an exposed public key</span></div>
-      <div class="fact spot rv" style="--d:.15s"><b class="count" data-to="3">0</b><span>NIST post-quantum standards finalized in August 2024</span></div>
-      <div class="fact spot rv" style="--d:.2s"><b>2029<i>to</i>2035</b><span>window of public Q-Day estimates</span></div>
-      <div class="fact spot rv" style="--d:.25s"><b class="count" data-to="0">0</b><span>hash layers between a Solana address and its public key</span></div>
-      <div class="fact spot rv" style="--d:.3s"><b>ECDSA, Ed25519</b><span>the signature schemes most wallets use today, both broken by Shor's algorithm</span></div>
+      <div class="fact rv"><b class="count" data-to="2330" data-prefix="~">0</b><span>logical qubits estimated to break a 256-bit elliptic curve key</span></div>
+      <div class="fact rv" style="--d:.05s"><b class="count" data-to="25" data-prefix="~" data-suffix="%">0</b><span>of all bitcoin sits on addresses with an exposed public key</span></div>
+      <div class="fact rv" style="--d:.1s"><b class="count" data-to="3">0</b><span>post-quantum standards finalized by NIST in August 2024</span></div>
+      <div class="fact rv" style="--d:.15s"><b>2029 to 2035</b><span>window of public Q-Day estimates</span></div>
+      <div class="fact rv" style="--d:.2s"><b class="count" data-to="0">0</b><span>hash layers between a Solana address and its public key</span></div>
     </div>
   </div>
 </section>
 
-<!-- CHAINS -->
 <section class="sec" id="chains">
   <div class="sec-head">
-    <h2 class="rv">Post-quantum readiness by chain</h2>
-    <p class="rv" style="--d:.1s">How far each network is from letting users move to quantum safe signatures. QSHIELD readiness score, higher is better.</p>
+    <h2 class="h-lg split" data-split>Readiness by chain</h2>
+    <p class="rv">How far each network is from letting users move to quantum safe signatures. QSHIELD readiness score, higher is better.</p>
   </div>
   <div class="chain-list">
     <div class="crow rv"><span class="cn">Bitcoin</span><span class="cb"><i data-w="15"></i></span><b class="cp">15</b><span class="cr crit">Critical</span></div>
@@ -276,100 +175,50 @@
   </div>
 </section>
 
-<!-- TOKEN -->
-<section class="sec token" id="token">
-  <video class="bgvid soft" data-src="qs-token.mp4" muted loop playsinline preload="none" aria-hidden="true"></video>
-  <div class="sec-head">
-    <h2 class="rv"><span class="shiny-cu">$QSHLD</span></h2>
-    <p class="rv" style="--d:.1s">The scanner is free and stays free. $QSHLD unlocks the tools built on top of it. Premium actions burn tokens when you use them, so the supply only goes down.</p>
-  </div>
-
-  <div class="ca rv" style="--d:.15s" id="ca-box">
-    <span class="ca-lbl">Contract</span>
-    <code id="ca-val">Coming soon</code>
-    <button type="button" class="ca-copy" id="ca-copy" hidden>Copy</button>
-    <a class="ca-buy" id="ca-buy" href="#" target="_blank" rel="noopener" hidden>Buy</a>
-  </div>
-
-  <div class="tiers">
-    <div class="tier spot rv" style="--d:.1s">
-      <div class="t-top"><h3>Scout</h3><span class="tag">Coming</span></div>
-      <div class="t-amt"><b class="count" data-to="100">0</b> $QSHLD held</div>
-      <ul><li>Watchlist for up to 3 wallets</li><li>Weekly threat index digest</li><li>Private holder community</li></ul>
+<section class="token" id="token">
+  <div class="media"><img src="media/token.jpg" alt="" loading="lazy"><video data-src="media/token.mp4" muted loop playsinline preload="none" aria-hidden="true"></video></div>
+  <div class="token-in">
+    <div class="eyebrow rv"><i></i>Utility token</div>
+    <h2 class="h-xl"><span class="gold-text">$QSHLD</span></h2>
+    <p class="lede rv">The scanner is free and stays free. $QSHLD unlocks the tools built on top of it, and premium actions burn tokens when you use them.</p>
+    <div class="ca rv"><span>Contract</span><code id="ca-val">Coming soon</code><button type="button" class="btn btn-ghost" id="ca-copy" hidden>Copy</button><a class="btn btn-gold" id="ca-buy" href="#" target="_blank" rel="noopener" hidden>Buy</a></div>
+    <div class="tiers">
+      <div class="tier rv"><div class="t-top"><h3>Scout</h3><span class="tag">Coming</span></div><div class="t-amt"><b class="count" data-to="100">0</b>$QSHLD held</div><ul><li>Watchlist for up to 3 wallets</li><li>Weekly threat index digest</li><li>Private holder community</li></ul></div>
+      <div class="tier main rv" style="--d:.1s"><div class="t-top"><h3>Sentinel</h3><span class="tag">Coming</span></div><div class="t-amt"><b class="count" data-to="1000">0</b>$QSHLD held</div><ul><li>Instant alert when a watched wallet gets exposed</li><li>Migration checklist for your wallet type</li><li>Watchlist for up to 25 wallets</li></ul></div>
+      <div class="tier rv" style="--d:.2s"><div class="t-top"><h3>Fortress</h3><span class="tag">Coming</span></div><div class="t-amt"><b class="count" data-to="10000">0</b>$QSHLD held</div><ul><li>Monitoring across all six chains</li><li>Early access to vault integrations</li><li>Votes on the readiness scores</li></ul></div>
     </div>
-    <div class="tier spot main rv" style="--d:.2s">
-      <div class="t-top"><h3>Sentinel</h3><span class="tag">Coming</span></div>
-      <div class="t-amt"><b class="count" data-to="1000">0</b> $QSHLD held</div>
-      <ul><li>Alerts on Telegram when a watched wallet gets exposed</li><li>Migration checklist for your wallet type</li><li>Watchlist for up to 25 wallets</li></ul>
-    </div>
-    <div class="tier spot rv" style="--d:.3s">
-      <div class="t-top"><h3>Fortress</h3><span class="tag">Coming</span></div>
-      <div class="t-amt"><b class="count" data-to="10000">0</b> $QSHLD held</div>
-      <ul><li>Portfolio monitoring across all six chains</li><li>Early access to vault integrations</li><li>Votes on the readiness scores</li></ul>
-    </div>
-  </div>
-
-  <div class="burn spot rv">
-    <div class="burn-ico" aria-hidden="true"></div>
-    <div>
-      <h3>Deflationary by design</h3>
-      <p>Deep scans, migration reports and monitoring burn $QSHLD on-chain. More users, more burns. No minting and no inflation.</p>
-    </div>
+    <p class="burn rv"><b>Deflationary by design.</b> Deep scans, reports and monitoring burn $QSHLD on-chain. No minting, no inflation.</p>
   </div>
 </section>
 
-<!-- ROADMAP -->
 <section class="sec" id="roadmap">
-  <div class="sec-head">
-    <h2 class="rv">What is live and what comes next</h2>
-  </div>
+  <div class="sec-head"><h2 class="h-lg split" data-split>What is live and what comes next</h2></div>
   <div class="road">
-    <div class="phase rv">
-      <span class="ph live">Live</span>
-      <h3>Exposure scanner</h3>
-      <p>Bitcoin, Ethereum, Solana, Base, Arbitrum and Polygon. Threat index and chain readiness scores.</p>
-    </div>
-    <div class="phase rv" style="--d:.1s">
-      <span class="ph build">Building</span>
-      <h3>Alerts and watchlists</h3>
-      <p>$QSHLD on Solana. A Telegram bot that watches your wallets and pings you the moment one gets exposed.</p>
-    </div>
-    <div class="phase rv" style="--d:.2s">
-      <span class="ph next">Next</span>
-      <h3>Migration and vaults</h3>
-      <p>Step by step migration guides per wallet, an API for exchanges, and integration with open source quantum resistant vaults.</p>
-    </div>
+    <div class="phase rv"><span class="ph live">Live</span><h3>Exposure scanner</h3><p>Bitcoin, Ethereum, Solana, Base, Arbitrum and Polygon. Threat index and chain readiness scores.</p></div>
+    <div class="phase rv" style="--d:.1s"><span class="ph build">Building</span><h3>Alerts and watchlists</h3><p>$QSHLD launch. A bot that watches your wallets and pings you the moment one gets exposed.</p></div>
+    <div class="phase rv" style="--d:.2s"><span class="ph next">Next</span><h3>Migration and vaults</h3><p>Step by step migration guides per wallet, an API for exchanges, and integration with open source quantum resistant vaults.</p></div>
   </div>
 </section>
 
-<!-- FINAL CTA -->
 <section class="final">
-  <video class="bgvid" data-src="qs-final.mp4" muted loop playsinline preload="none" aria-hidden="true"></video>
+  <div class="media"><img src="media/step5.jpg" alt="" loading="lazy"><video data-src="media/step5.mp4" muted loop playsinline preload="none" aria-hidden="true"></video></div>
   <div class="final-in">
-    <h2 class="rv">Find out in ten seconds.</h2>
-    <p class="rv" style="--d:.1s">Paste an address. No wallet connect, no sign-up.</p>
-    <div class="final-btns rv" style="--d:.2s">
-      <a href="#top" class="btn-ice" data-focus-scan>Scan wallet</a>
-      <a href="#how" class="btn-ghost">How it works</a>
-    </div>
+    <h2 class="h-xl split" data-split>Find out in ten seconds.</h2>
+    <p class="rv">Paste an address. No wallet connect, no sign-up.</p>
+    <div class="final-btns rv"><a href="#top" class="btn btn-gold" data-focus-scan>Scan wallet</a><a href="docs.html" class="btn btn-ghost">Read the docs</a></div>
   </div>
 </section>
 
-<section class="legal">
-  <p><strong>Disclaimer.</strong> QSHIELD is an informational tool. The threat index, chain readiness scores and scanner results are based on public data and our own modeling. They are not financial advice and not a guarantee of security. Quantum computing timelines are projections and can change a lot. $QSHLD is a utility token that gives access to QSHIELD features. It is not a security, does not represent ownership in any entity and carries no expectation of profit. Buying or holding it involves risk, including total loss. Crypto markets are volatile and unregulated in many places. Do your own research. QSHIELD is not liable for any losses.</p>
-</section>
-
+<section class="legal"><p><strong>Disclaimer.</strong> QSHIELD is an informational tool. The threat index, chain readiness scores and scanner results are based on public data and our own modeling. They are not financial advice and not a guarantee of security. Quantum computing timelines are projections and can change a lot. $QSHLD is a utility token that gives access to QSHIELD features. It is not a security, does not represent ownership in any entity and carries no expectation of profit. Buying or holding it involves risk, including total loss. Crypto markets are volatile and unregulated in many places. Do your own research. QSHIELD is not liable for any losses.</p></section>
 </main>
 
 <footer class="foot">
   <a href="#top" class="brand"><img src="assets/logo-128.png" alt="" width="26" height="26"><span>QSHIELD</span></a>
-  <nav class="foot-links" aria-label="Footer">
-    <a href="docs.html">Docs</a>
-    <a href="docs.html#api">API</a>
-  </nav>
+  <nav class="foot-links" aria-label="Footer"><a href="docs.html">Docs</a><a href="docs.html#api">API</a></nav>
   <span class="foot-c">&copy; 2026 QSHIELD</span>
 </footer>
 
-<script src="assets/qs.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js" defer></script>
+<script src="assets/qs.js" defer></script>
 </body>
 </html>

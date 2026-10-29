@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Docs | QSHIELD</title>
+<meta name="description" content="How the QSHIELD quantum exposure scanner works, what every result means, what to do next, the threat index method, $QSHLD and the public scan API.">
+<meta name="robots" content="index, follow">
+<link rel="canonical" href="https://qshld.tech/docs.html">
+<meta property="og:type" content="article">
+<meta property="og:url" content="https://qshld.tech/docs.html">
+<meta property="og:title" content="QSHIELD Docs">
+<meta property="og:description" content="How the quantum exposure scanner works and what every result means.">
+<meta property="og:image" content="https://qshld.tech/og-image.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:site_name" content="QSHIELD">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="QSHIELD Docs">
+<meta name="twitter:description" content="How the quantum exposure scanner works and what every result means.">
+<meta name="twitter:image" content="https://qshld.tech/og-image.png">
+<meta name="theme-color" content="#03050A">
+<meta name="color-scheme" content="dark">
+<link rel="icon" href="/favicon.ico" sizes="48x48">
+<link rel="icon" href="/favicon-32x32.png" type="image/png" sizes="32x32">
+<link rel="icon" href="/favicon-16x16.png" type="image/png" sizes="16x16">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png" sizes="180x180">
+<link rel="manifest" href="/site.webmanifest">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/qs.css">
+<link rel="stylesheet" href="assets/docs.css">
+</head>
+<body class="docs">
+
+<div class="aurora" aria-hidden="true"><i></i><i></i><i></i></div>
+<div class="grain" aria-hidden="true"></div>
+
+<header class="nav-wrap">
+  <nav class="nav" aria-label="Main">
+    <a href="/" class="brand"><img src="assets/logo-128.png" alt="" width="30" height="30"><span>QSHIELD</span></a>
+    <ul class="nav-links">
+      <li><a href="/#how">How it works</a></li>
+      <li><a href="/#index">Threat index</a></li>
+      <li><a href="/#token">$QSHLD</a></li>
+      <li><a href="docs.html" class="on" aria-current="page">Docs</a></li>
+    </ul>
+    <a href="/" class="nav-cta">Scan wallet</a>
+  </nav>
+</header>
+
+<div class="doc-wrap">
+  <aside class="doc-side">
+    <nav aria-label="Docs">
+      <a href="#overview">Overview</a>
+      <a href="#how-it-works">How the scan works</a>
+      <a href="#results">What your result means</a>
+      <a href="#address-types">Address types</a>
+      <a href="#next-steps">What to do next</a>
+      <a href="#threat-index">Threat index</a>
+      <a href="#token">$QSHLD</a>
+      <a href="#api">API</a>
+      <a href="#privacy">Privacy</a>
+      <a href="#faq">FAQ</a>
+    </nav>
+  </aside>
+
+  <main class="doc">
+    <section id="overview">
+      <h1>QSHIELD docs</h1>
+      <p class="lead">QSHIELD checks whether a wallet's public key is already visible on-chain. A future quantum computer running Shor's algorithm could turn a visible public key back into the private key. The scan tells you where each address stands today and what you can do about it.</p>
+      <div class="cards">
+        <div class="card"><b>Read only</b><span>Paste an address. No wallet connect, no signatures, no seed phrase. Ever.</span></div>
+        <div class="card"><b>Six chains</b><span>Bitcoin, Ethereum, Solana, Base, Arbitrum and Polygon.</span></div>
+        <div class="card"><b>Free</b><span>The basic scan is free and stays free.</span></div>
+      </div>
+    </section>
+
+    <section id="how-it-works">
+      <h2>How the scan works</h2>
+      <p>Most wallets sign transactions with elliptic curve cryptography (ECDSA or Ed25519 today). Those signatures are safe against normal computers. They are not safe against a large, fault tolerant quantum computer, because Shor's algorithm can recover a private key from its public key.</p>
+      <p>So the question is simple: can someone see your public key?</p>
+      <ol class="steps">
+        <li><b>Format check.</b> We check that the address is valid for the chain you picked and detect its type.</li>
+        <li><b>Chain lookup.</b> We query public nodes for the address: balance, transaction count and whether it ever signed something.</li>
+        <li><b>Exposure check.</b> We work out if the public key is hidden behind a hash, already revealed by a past transaction, or visible by design.</li>
+        <li><b>Result.</b> You get a status, the raw numbers behind it and a plain explanation.</li>
+      </ol>
+    </section>
+
+    <section id="results">
+      <h2>What your result means</h2>
+      <div class="table">
+        <div class="tr th"><span>Result</span><span>Meaning</span></div>
+        <div class="tr"><span><i class="dot red"></i>Exposed</span><span>This address has signed at least one transaction, so its public key is on-chain for good.</span></div>
+        <div class="tr"><span><i class="dot red"></i>Exposed by design</span><span>The address format itself contains the public key. True for every Solana wallet and for Bitcoin Taproot addresses (bc1p).</span></div>
+        <div class="tr"><span><i class="dot green"></i>Protected</span><span>The address has never signed anything. Only a hash of the public key is known, and a hash cannot be reversed. The first send changes this.</span></div>
+        <div class="tr"><span><i class="dot green"></i>No private key</span><span>A Solana address that is not on the Ed25519 curve. No private key exists, so there is nothing to recover. A program controls the funds.</span></div>
+        <div class="tr"><span><i class="dot cu"></i>Smart contract</span><span>An EVM contract address. Its safety depends on the keys of whoever controls the contract.</span></div>
+        <div class="tr"><span><i class="dot cu"></i>Program account</span><span>An executable Solana program, not a wallet.</span></div>
+      </div>
+      <p class="note">Exposed does not mean anyone can take your funds today. It means the key is already public and will be at risk once quantum hardware is good enough.</p>
+    </section>
+
+    <section id="address-types">
+      <h2>Address types</h2>
+      <div class="table">
+        <div class="tr th"><span>Address</span><span>Before the first send</span><span>After a send</span></div>
+        <div class="tr"><span>Bitcoin legacy (1...)</span><span>Hidden behind a hash</span><span>Exposed</span></div>
+        <div class="tr"><span>Bitcoin P2SH (3...)</span><span>Hidden behind a hash</span><span>Exposed</span></div>
+        <div class="tr"><span>Bitcoin SegWit (bc1q...)</span><span>Hidden behind a hash</span><span>Exposed</span></div>
+        <div class="tr"><span>Bitcoin Taproot (bc1p...)</span><span>Exposed by design</span><span>Exposed</span></div>
+        <div class="tr"><span>Ethereum, Base, Arbitrum, Polygon (0x...)</span><span>Hidden behind a hash</span><span>Exposed</span></div>
+        <div class="tr"><span>Solana wallet</span><span>Exposed by design</span><span>Exposed</span></div>
+      </div>
+    </section>
+
+    <section id="next-steps">
+      <h2>What to do next</h2>
+      <h3>Bitcoin</h3>
+      <p>Keep long term funds on an address that has never sent a transaction, and do not reuse addresses. Most modern wallets create a fresh receive address for you. A SegWit address (bc1q) keeps the key hidden until its first send. Taproot does not.</p>
+      <h3>Ethereum and EVM chains</h3>
+      <p>EVM accounts reuse one address, so every send reveals the key. A fresh address stays hidden only until its first outgoing transaction. Keep a cold address that you only ever receive to.</p>
+      <h3>Solana</h3>
+      <p>There is no hash layer on Solana, so a fresh address does not help. Real protection means moving funds into a quantum resistant vault program that uses hash based signatures. These exist but are optional and still early, so check any vault carefully before you trust it with funds.</p>
+    </section>
+
+    <section id="threat-index">
+      <h2>Threat index</h2>
+      <p>The threat index is our own score from 0 to 100 for how close quantum hardware is to breaking the signatures crypto runs on. It is a model, not a measurement.</p>
+      <p>Inputs we track:</p>
+      <ul class="list">
+        <li>Public hardware roadmaps from the large quantum computing labs</li>
+        <li>Peer reviewed resource estimates for breaking 256-bit elliptic curve keys</li>
+        <li>Error correction progress and logical qubit demonstrations</li>
+        <li>Post-quantum standards from NIST and how fast chains adopt them</li>
+      </ul>
+      <p>The chain readiness scores follow the same idea: how far each network is from letting users move to quantum safe signatures.</p>
+    </section>
+
+    <section id="token">
+      <h2>$QSHLD</h2>
+      <p>The scanner is free. $QSHLD unlocks the tools built on top of it: watchlists, instant alerts when a watched wallet gets exposed, scans across all chains at once and deep reports. Premium actions burn tokens when you use them.</p>
+      <p>Holder tiers and their features are marked as coming on the main page until they are live. The contract address will be published on qshld.tech. Do not trust any address you get from someone else.</p>
+    </section>
+
+    <section id="api">
+      <h2>API <span class="tag">Beta</span></h2>
+      <p>The same scan the website uses, as one HTTP endpoint. No key needed during the beta.</p>
+      <pre><code><span class="k">GET</span> https://qshld-api-production.up.railway.app/api/scan?address=<span class="v">ADDRESS</span>&amp;chain=<span class="v">CHAIN</span></code></pre>
+      <div class="table">
+        <div class="tr th"><span>Parameter</span><span>Values</span></div>
+        <div class="tr"><span><code>address</code></span><span>The wallet address to scan</span></div>
+        <div class="tr"><span><code>chain</code></span><span><code>btc</code>, <code>eth</code>, <code>sol</code>, <code>base</code>, <code>arb</code>, <code>poly</code></span></div>
+      </div>
+      <p>Example response:</p>
+<pre><code>{
+  "success": true,
+  "chain": "Bitcoin",
+  "status": "exposed",
+  "address_type": "P2WPKH (SegWit)",
+  "outgoing_tx": 37,
+  "total_tx": 81,
+  "balance": "0.4120 BTC",
+  "public_key": "on-chain",
+  "detail": "37 outgoing transactions detected. Public key permanently visible on-chain."
+}</code></pre>
+      <p><code>status</code> is one of <code>exposed</code>, <code>inherently_exposed</code>, <code>protected</code>, <code>no_private_key</code>, <code>contract</code> or <code>program</code>. Errors come back as <code>{"error": "..."}</code> with a 4xx or 5xx code.</p>
+      <p>Limit: 10 requests per minute per IP. Browsers can only call it from qshld.tech, server side calls work from anywhere.</p>
+    </section>
+
+    <section id="privacy">
+      <h2>Privacy</h2>
+      <ul class="list">
+        <li>No accounts, no wallet connect, no signatures.</li>
+        <li>We do not keep a database of scanned addresses or results.</li>
+        <li>Server logs keep a shortened address and the result for a short time so we can fix bugs.</li>
+        <li>The lookup itself goes to public blockchain nodes, like any block explorer.</li>
+      </ul>
+    </section>
+
+    <section id="faq">
+      <h2>FAQ</h2>
+      <details><summary>My wallet says Exposed. Am I being hacked?</summary><p>No. No quantum computer today can break these keys. Exposed means the key is already public, so it will be at risk once the hardware arrives. You have time to move, and you should not wait until the last moment.</p></details>
+      <details><summary>Why is every Solana wallet exposed?</summary><p>On Solana the address is the public key. There is no hash in between, so the key is visible from the moment the address exists.</p></details>
+      <details><summary>Does QSHIELD ever ask for my seed phrase?</summary><p>Never. Anyone who asks for it is trying to steal your funds, whatever name they use.</p></details>
+      <details><summary>Is QSHIELD a wallet?</summary><p>No. QSHIELD scans and explains. It never holds or moves your funds.</p></details>
+      <details><summary>When is Q-Day?</summary><p>Nobody knows. Public estimates range from 2029 to 2035. The countdown on our site uses the earliest one, because that is the date to plan for.</p></details>
+    </section>
+
+    <p class="legal-mini">QSHIELD is an informational tool and not financial advice. Results are based on public data and our own modeling. Quantum timelines are projections and can change.</p>
+  </main>
+</div>
+
+<footer class="foot">
+  <a href="/" class="brand"><img src="assets/logo-128.png" alt="" width="26" height="26"><span>QSHIELD</span></a>
+  <nav class="foot-links" aria-label="Footer">
+    <a href="/">Scanner</a>
+    <a href="docs.html#api">API</a>
+  </nav>
+  <span class="foot-c">&copy; 2026 QSHIELD</span>
+</footer>
+
+<script src="assets/docs.js"></script>
+</body>
+</html>
